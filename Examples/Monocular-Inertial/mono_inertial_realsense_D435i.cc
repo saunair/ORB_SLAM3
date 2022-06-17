@@ -261,6 +261,7 @@ int main(int argc, char **argv) {
     rs2::stream_profile cam_stream = pipe_profile.get_stream(RS2_STREAM_INFRARED, 1);
 
 
+    cout<<"Pipe line"<<endl;
     rs2::stream_profile imu_stream = pipe_profile.get_stream(RS2_STREAM_GYRO);
     float* Rbc = cam_stream.get_extrinsics_to(imu_stream).rotation;
     float* tbc = cam_stream.get_extrinsics_to(imu_stream).translation;
@@ -302,6 +303,7 @@ int main(int argc, char **argv) {
     double t_resize = 0.f;
     double t_track = 0.f;
 
+    cout<<"before slam starts!"<<endl;
     while (!SLAM.isShutDown())
     {
         std::vector<rs2_vector> vGyro;
@@ -326,6 +328,7 @@ int main(int argc, char **argv) {
 
             while(v_gyro_timestamp.size() > v_accel_timestamp_sync.size())
             {
+		cout<<"Inside Gyro while case"<<endl;
                 int index = v_accel_timestamp_sync.size();
                 double target_time = v_gyro_timestamp[index];
 
@@ -360,6 +363,7 @@ int main(int argc, char **argv) {
                                   vGyro[i].x, vGyro[i].y, vGyro[i].z,
                                   vGyro_times[i]);
             vImuMeas.push_back(lastPoint);
+            cout<<"Inside Gyro for"<<endl;
         }
 
         if(imageScale != 1.f)
@@ -382,6 +386,7 @@ int main(int argc, char **argv) {
     #endif
             t_resize = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(t_End_Resize - t_Start_Resize).count();
             SLAM.InsertResizeTime(t_resize);
+	    cout<<"Inside image scale"<<endl;
 #endif
         }
 
@@ -393,7 +398,9 @@ int main(int argc, char **argv) {
     #endif
 #endif
         // Pass the image to the SLAM system
+	cout<<"before track monocular"<<endl;
         SLAM.TrackMonocular(im, timestamp, vImuMeas);
+	cout<<"After track monocular"<<endl;
 #ifdef REGISTER_TIMES
     #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t_End_Track = std::chrono::steady_clock::now();
@@ -402,6 +409,7 @@ int main(int argc, char **argv) {
     #endif
         t_track = t_resize + std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(t_End_Track - t_Start_Track).count();
         SLAM.InsertTrackTime(t_track);
+        cout<<"Track time?"<<endl;
 #endif
 
 

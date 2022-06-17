@@ -81,7 +81,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
         mStrLoadAtlasFromFile = settings_->atlasLoadFile();
         mStrSaveAtlasToFile = settings_->atlasSaveFile();
 
-        cout << (*settings_) << endl;
+        //cout << (*settings_) << endl;
     }
     else{
         settings_ = nullptr;
@@ -442,6 +442,7 @@ Sophus::SE3f System::TrackMonocular(const cv::Mat &im, const double &timestamp, 
         }
     }
 
+    cout<<"check reset"<<endl;
     // Check reset
     {
         unique_lock<mutex> lock(mMutexReset);
@@ -462,8 +463,11 @@ Sophus::SE3f System::TrackMonocular(const cv::Mat &im, const double &timestamp, 
     if (mSensor == System::IMU_MONOCULAR)
         for(size_t i_imu = 0; i_imu < vImuMeas.size(); i_imu++)
             mpTracker->GrabImuData(vImuMeas[i_imu]);
+    cout<<"before grab image monocular"<<endl;
 
     Sophus::SE3f Tcw = mpTracker->GrabImageMonocular(imToFeed,timestamp,filename);
+    cout<<"After grab image monocular"<<endl;
+
 
     unique_lock<mutex> lock2(mMutexState);
     mTrackingState = mpTracker->mState;
